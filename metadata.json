@@ -1,0 +1,7 @@
+{
+  "name": "ZenHome",
+  "description": "A mindful living assistant for your home inventory, powered by AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

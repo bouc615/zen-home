@@ -5,7 +5,7 @@ import { ItemType, InventoryItem, Recipe } from "../types";
  */
 export function getImageAnalysisPrompt(type: ItemType): string {
   return type === ItemType.FRIDGE
-    ? "识别这张图片中的所有食物。对于每个食物：如果是新鲜食材,请预估从今天(YYYY-MM-DD)开始的保质期;如果是包装食品,请尝试读取标签。为每个食物建议一个分类(如蔬菜、乳制品、肉类等)和数量。**最重要的是，为每个食物匹配一个最合适的 Emoji 表情符号**。请全部使用简体中文返回。如果图片中有多个物品,请全部识别出来。"
+    ? "识别这张图片中的所有食物。对于每个食物：如果是新鲜食材,请预估从今天(YYYY-MM-DD)开始的保质期;如果是包装食品,请尝试读取标签。为每个食物建议一个分类(如蔬菜、乳制品、肉类等)和数量。请全部使用简体中文返回。如果图片中有多个物品,请全部识别出来。"
     : "识别这张图片中的所有衣物。对于每件衣物：建议一个分类(如上装、下装、鞋履、配饰等)、主要颜色、和适用季节(夏季、冬季、四季)。请全部使用简体中文返回。如果图片中有多件衣物,请全部识别出来。";
 }
 
@@ -16,7 +16,6 @@ export function getImageAnalysisSchema(type: ItemType) {
   const itemSchema = type === ItemType.FRIDGE
     ? {
       name: { type: "string", description: "食物名称 (中文)" },
-      emoji: { type: "string", description: "代表该食物的 Emoji，如 🍎, 🥩, 🥛" },
       category: { type: "string", description: "类别,如蔬菜、水果、乳制品 (中文)" },
       expiryDate: { type: "string", description: "预估过期日期 YYYY-MM-DD" },
       quantity: { type: "string", description: "数量,例如 '1把', '500g', '1盒' (中文)" },

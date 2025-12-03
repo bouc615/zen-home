@@ -4,6 +4,7 @@ import { GlassCard } from './GlassCard';
 import { InventoryItem, ItemType } from '../types';
 import { FRIDGE_CATEGORIES, WARDROBE_CATEGORIES } from '../constants';
 import { uploadFile } from '../services/cloudService';
+import { ItemIcon } from '../utils/iconMapper';
 
 interface EditItemModalProps {
   isOpen: boolean;
@@ -95,15 +96,14 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
               </div>
             )}
 
-            {/* Emoji Input (Only for Fridge) */}
+            {/* Icon Display (Only for Fridge) */}
             {type === ItemType.FRIDGE && (
               <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-6xl border border-zinc-100 shadow-inner">
-                  <input
-                    className="w-full h-full text-center bg-transparent focus:outline-none"
-                    value={formData.emoji || '🍎'}
-                    onChange={e => setFormData({ ...formData, emoji: e.target.value })}
-                    maxLength={2} // Allow 1-2 chars for emoji
+                <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-600 border border-zinc-100 shadow-inner">
+                  <ItemIcon
+                    category={formData.category || ''}
+                    name={formData.name || ''}
+                    className="w-12 h-12"
                   />
                 </div>
               </div>

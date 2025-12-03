@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { InventoryItem, ItemType } from '../types';
+import { ItemIcon } from '../utils/iconMapper';
 
 interface ItemCardProps {
   item: InventoryItem;
@@ -52,9 +53,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onEdit, onDelete, inde
     >
       <div className="h-full flex flex-col cursor-pointer group" onClick={() => !showMenu && onEdit(item)}>
         <div className="aspect-square w-full relative overflow-hidden bg-zinc-100 mb-3">
-          {item.emoji ? (
-            <div className="w-full h-full flex items-center justify-center bg-zinc-50 text-6xl">
-              {item.emoji}
+          {item.type === ItemType.FRIDGE ? (
+            <div className="w-full h-full flex items-center justify-center bg-zinc-50 text-zinc-600">
+              <ItemIcon category={item.category} name={item.name} className="w-16 h-16 opacity-80" />
             </div>
           ) : item.imageUrl ? (
             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-in-out group-hover:scale-110" />

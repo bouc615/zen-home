@@ -19,13 +19,37 @@ import { RecipeModal } from './components/RecipeModal';
 import { AIChatView } from './components/AIChatView';
 import { AppView, InventoryItem, ItemType, UserProfile, Recipe } from './types';
 import { analyzeImage } from './services/aiService';
-import { INITIAL_ITEMS, INITIAL_RECIPES } from './constants';
+import { fetchItems, fetchRecipes, addItem, updateItem, deleteItem, addRecipe, updateRecipe, deleteRecipe, uploadFile } from './services/cloudService';
+
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>(AppView.FRIDGE);
-  const [items, setItems] = useState<InventoryItem[]>(INITIAL_ITEMS);
-  const [recipes, setRecipes] = useState<Recipe[]>(INITIAL_RECIPES);
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isThinking, setIsThinking] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ... (other state definitions)
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const [cloudItems, cloudRecipes] = await Promise.all([fetchItems(), fetchRecipes()]);
+        setItems(cloudItems);
+        setRecipes(cloudRecipes);
+      } catch (e) {
+        console.error("Failed to load cloud data", e);
+        setItems([]);
+        setRecipes([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // ... (rest of the component)
   const [showEditModal, setShowEditModal] = useState(false);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -98,13 +122,21 @@ const App: React.FC = () => {
       setIsThinking(true);
       try {
         const type = view === AppView.WARDROBE ? ItemType.WARDROBE : ItemType.FRIDGE;
+
+        // Only upload image for wardrobe items to save storage
+        let cloudImageUrl = '';
+        if (type === ItemType.WARDROBE) {
+          cloudImageUrl = await uploadFile(file);
+        }
+
         const analysis = await analyzeImage(base64Data, type);
 
         if (analysis.items && analysis.items.length > 0) {
           if (analysis.items.length === 1) {
             const item = analysis.items[0];
             const newItem: Partial<InventoryItem> = {
-              imageUrl: base64,
+              imageUrl: cloudImageUrl,
+              emoji: item.emoji, // Use emoji from analysis
               type: type,
               name: item.name,
               category: item.category,
@@ -119,32 +151,39 @@ const App: React.FC = () => {
             setIsNewItem(true);
             setShowEditModal(true);
           } else {
-            const newItems = analysis.items.map((item, index) => ({
-              id: `${Date.now()}-${index}`,
-              imageUrl: base64,
-              type: type,
-              name: item.name,
-              category: item.category,
-              expiryDate: item.expiryDate,
-              quantity: item.quantity,
-              season: item.season,
-              color: item.color,
-              addedAt: Date.now(),
-            } as InventoryItem));
+            const newItems = await Promise.all(analysis.items.map(async (item, index) => {
+              const newItem = {
+                id: `${Date.now()}-${index}`,
+                imageUrl: cloudImageUrl,
+                emoji: item.emoji, // Use emoji from analysis
+                type: type,
+                name: item.name,
+                category: item.category,
+                expiryDate: item.expiryDate,
+                quantity: item.quantity,
+                season: item.season,
+                color: item.color,
+                addedAt: Date.now(),
+              };
+              // Add to cloud
+              await addItem(newItem as InventoryItem);
+              return newItem;
+            }));
 
-            setItems(prev => [...newItems, ...prev]);
-            alert(`成功识别 ${analysis.totalCount} 个物品！`);
+            setItems(prev => [...newItems as InventoryItem[], ...prev]);
           }
         }
       } catch (error) {
-        console.error(error);
-        alert('无法识别图片，请重试');
+        console.error('Analysis failed:', error);
+        alert('识别失败，请重试');
       } finally {
         setIsThinking(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
     };
     reader.readAsDataURL(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleManualAdd = () => {
@@ -157,23 +196,29 @@ const App: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleSaveItem = (itemData: Partial<InventoryItem>) => {
+  const handleSaveItem = async (itemData: Partial<InventoryItem>) => {
     if (isNewItem) {
       const newItem = { ...itemData, id: Date.now().toString() } as InventoryItem;
+      await addItem(newItem);
       setItems(prev => [newItem, ...prev]);
     } else {
-      setItems(prev => prev.map(i => i.id === editingItem?.id ? { ...i, ...itemData } : i));
+      const updatedItem = { ...editingItem, ...itemData } as InventoryItem;
+      await updateItem(updatedItem);
+      setItems(prev => prev.map(i => i.id === editingItem?.id ? updatedItem : i));
     }
     setShowEditModal(false);
     setEditingItem(null);
   };
 
-  const handleSaveRecipe = (recipeData: Partial<Recipe>) => {
+  const handleSaveRecipe = async (recipeData: Partial<Recipe>) => {
     if (isNewRecipe) {
       const newRecipe = { ...recipeData, id: Date.now().toString(), addedAt: Date.now() } as Recipe;
+      await addRecipe(newRecipe);
       setRecipes(prev => [newRecipe, ...prev]);
     } else {
-      setRecipes(prev => prev.map(r => r.id === editingRecipe?.id ? { ...r, ...recipeData } as Recipe : r));
+      const updatedRecipe = { ...editingRecipe, ...recipeData } as Recipe;
+      await updateRecipe(updatedRecipe);
+      setRecipes(prev => prev.map(r => r.id === editingRecipe?.id ? updatedRecipe : r));
     }
     setShowRecipeModal(false);
     setEditingRecipe(null);
@@ -184,12 +229,14 @@ const App: React.FC = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingItem) {
+      await deleteItem(deletingItem.id);
       setItems(prev => prev.filter(i => i.id !== deletingItem.id));
       setDeletingItem(null);
     }
     if (deletingRecipe) {
+      await deleteRecipe(deletingRecipe.id);
       setRecipes(prev => prev.filter(r => r.id !== deletingRecipe.id));
       setDeletingRecipe(null);
     }

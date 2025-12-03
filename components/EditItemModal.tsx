@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { X, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, ChevronDown, Camera, Upload } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { InventoryItem, ItemType } from '../types';
 import { FRIDGE_CATEGORIES, WARDROBE_CATEGORIES } from '../constants';
+import { uploadFile } from '../services/cloudService';
 
 interface EditItemModalProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ interface EditItemModalProps {
 
 export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, onSave, initialData, type, isNew }) => {
   const [formData, setFormData] = useState<Partial<InventoryItem>>({});
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const categories = type === ItemType.FRIDGE ? FRIDGE_CATEGORIES : WARDROBE_CATEGORIES;
 
   useEffect(() => {
@@ -26,6 +29,22 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
   const currentCategories = formData.category && !categories.includes(formData.category)
     ? [...categories, formData.category]
     : categories;
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadFile(file);
+      setFormData(prev => ({ ...prev, imageUrl: url }));
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("上传失败，请重试");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -40,6 +59,56 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
           </div>
 
           <div className="space-y-5">
+            {/* Image Upload Area (Only for Wardrobe) */}
+            {type === ItemType.WARDROBE && (
+              <div className="flex justify-center mb-4">
+                <div
+                  className="relative w-32 h-32 bg-zinc-100 cursor-pointer overflow-hidden group border border-zinc-200"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {formData.imageUrl ? (
+                    <img src={formData.imageUrl} alt="Item" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400">
+                      <Camera size={24} className="mb-2" />
+                      <span className="text-xs">添加图片</span>
+                    </div>
+                  )}
+
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <Upload size={20} className="text-white drop-shadow-md" />
+                  </div>
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </div>
+            )}
+
+            {/* Emoji Input (Only for Fridge) */}
+            {type === ItemType.FRIDGE && (
+              <div className="flex justify-center mb-4">
+                <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-6xl border border-zinc-100 shadow-inner">
+                  <input
+                    className="w-full h-full text-center bg-transparent focus:outline-none"
+                    value={formData.emoji || '🍎'}
+                    onChange={e => setFormData({ ...formData, emoji: e.target.value })}
+                    maxLength={2} // Allow 1-2 chars for emoji
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">名称</label>
               <input
@@ -113,9 +182,10 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
 
             <button
               onClick={() => onSave(formData)}
-              className="w-full py-3.5 btn-primary font-medium transition-all mt-4 active:scale-[0.98]"
+              disabled={isUploading}
+              className="w-full py-3.5 btn-primary font-medium transition-all mt-4 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isNew ? '确认入库' : '保存修改'}
+              {isUploading ? '正在上传...' : (isNew ? '确认入库' : '保存修改')}
             </button>
           </div>
         </GlassCard>

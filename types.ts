@@ -22,6 +22,7 @@ export interface InventoryItem {
   // Specific fields
   expiryDate?: string; // For fridge
   quantity?: string;   // For fridge
+  emoji?: string;      // For fridge items instead of image
   color?: string;      // For wardrobe
   season?: string;     // For wardrobe
   notes?: string;
@@ -46,6 +47,7 @@ export interface ChatMessage {
 export interface ItemAnalysis {
   name: string;
   category: string;
+  emoji?: string;
   expiryDate?: string;
   season?: string;
   color?: string;

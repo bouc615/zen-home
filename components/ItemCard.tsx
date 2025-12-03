@@ -52,7 +52,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onEdit, onDelete, inde
     >
       <div className="h-full flex flex-col cursor-pointer group" onClick={() => !showMenu && onEdit(item)}>
         <div className="aspect-square w-full relative overflow-hidden bg-zinc-100 mb-3">
-          {item.imageUrl ? (
+          {item.emoji ? (
+            <div className="w-full h-full flex items-center justify-center bg-zinc-50 text-6xl">
+              {item.emoji}
+            </div>
+          ) : item.imageUrl ? (
             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-in-out group-hover:scale-110" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-zinc-300 bg-zinc-50">

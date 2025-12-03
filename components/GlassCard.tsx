@@ -8,22 +8,22 @@ interface GlassCardProps {
   noPadding?: boolean;
 }
 
-export const GlassCard: React.FC<GlassCardProps> = ({ 
-  children, 
-  className = '', 
-  onClick, 
+export const GlassCard: React.FC<GlassCardProps> = ({
+  children,
+  className = '',
+  onClick,
   interactive = false,
   noPadding = false
 }) => {
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`
         relative overflow-hidden
         zen-glass
         rounded-[24px] md:rounded-[32px]
         transition-all duration-700 cubic-bezier(0.2, 0, 0.2, 1)
-        ${(interactive || onClick) ? 'hover:bg-white/70 hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/5 cursor-pointer active:scale-[0.99]' : ''}
+        ${(interactive || onClick) ? 'interactive cursor-pointer active:scale-[0.99]' : ''}
         ${noPadding ? '' : 'p-6 md:p-8'}
         ${className}
       `}

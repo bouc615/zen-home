@@ -4,6 +4,7 @@ export enum AppView {
   FRIDGE = 'FRIDGE',
   WARDROBE = 'WARDROBE',
   SETTINGS = 'SETTINGS',
+  RECIPES = 'RECIPES',
 }
 
 export enum ItemType {
@@ -26,13 +27,23 @@ export interface InventoryItem {
   notes?: string;
 }
 
+export interface Recipe {
+  id: string;
+  name: string;
+  imageUrl: string;
+  tags: string[]; // e.g., "Spicy", "Quick", "Dinner"
+  ingredients: string; // Stored as text for simplicity or JSON string
+  steps: string;       // Stored as text for simplicity
+  addedAt: number;
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: number;
 }
 
-export interface AnalysisResult {
+export interface ItemAnalysis {
   name: string;
   category: string;
   expiryDate?: string;
@@ -40,6 +51,11 @@ export interface AnalysisResult {
   color?: string;
   quantity?: string;
   suggestedUse?: string;
+}
+
+export interface AnalysisResult {
+  items: ItemAnalysis[];
+  totalCount: number;
 }
 
 export interface UserProfile {

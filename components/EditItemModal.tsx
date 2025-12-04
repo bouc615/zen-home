@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronDown, Camera, Upload } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { InventoryItem, ItemType } from '../types';
-import { FRIDGE_CATEGORIES, WARDROBE_CATEGORIES } from '../constants';
+import { FRIDGE_CATEGORIES } from '../constants';
 import { uploadFile } from '../services/cloudService';
 import { ItemIcon } from '../utils/iconMapper';
+import { IconPicker } from './IconPicker';
 
 interface EditItemModalProps {
   isOpen: boolean;
@@ -19,7 +20,26 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
   const [formData, setFormData] = useState<Partial<InventoryItem>>({});
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const categories = type === ItemType.FRIDGE ? FRIDGE_CATEGORIES : WARDROBE_CATEGORIES;
+  const categories = FRIDGE_CATEGORIES;
+
+  const [dateMode, setDateMode] = useState<'date' | 'duration'>('date');
+  const [durationValue, setDurationValue] = useState('');
+  const [durationUnit, setDurationUnit] = useState<'days' | 'weeks' | 'months'>('days');
+
+  useEffect(() => {
+    if (dateMode === 'duration') {
+      if (!durationValue) return;
+      const num = parseInt(durationValue);
+      if (isNaN(num)) return;
+
+      const date = new Date();
+      if (durationUnit === 'days') date.setDate(date.getDate() + num);
+      if (durationUnit === 'weeks') date.setDate(date.getDate() + num * 7);
+      if (durationUnit === 'months') date.setMonth(date.getMonth() + num);
+
+      setFormData(prev => ({ ...prev, expiryDate: date.toISOString().split('T')[0] }));
+    }
+  }, [durationValue, durationUnit, dateMode]);
 
   useEffect(() => {
     setFormData(initialData || { type });
@@ -47,6 +67,33 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
     }
   };
 
+  const handleModeSwitch = (mode: 'date' | 'duration') => {
+    setDateMode(mode);
+    if (mode === 'duration' && formData.expiryDate) {
+      const [y, m, d] = formData.expiryDate.split('-').map(Number);
+      const expiryDate = new Date(y, m - 1, d);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const diffTime = expiryDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 0) {
+        if (diffDays % 30 === 0) {
+          setDurationValue((diffDays / 30).toString());
+          setDurationUnit('months');
+        } else if (diffDays % 7 === 0) {
+          setDurationValue((diffDays / 7).toString());
+          setDurationUnit('weeks');
+        } else {
+          setDurationValue(diffDays.toString());
+          setDurationUnit('days');
+        }
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
@@ -59,55 +106,34 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
             </button>
           </div>
 
+
           <div className="space-y-5">
-            {/* Image Upload Area (Only for Wardrobe) */}
-            {type === ItemType.WARDROBE && (
-              <div className="flex justify-center mb-4">
-                <div
-                  className="relative w-32 h-32 bg-zinc-100 cursor-pointer overflow-hidden group border border-zinc-200"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {formData.imageUrl ? (
-                    <img src={formData.imageUrl} alt="Item" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400">
-                      <Camera size={24} className="mb-2" />
-                      <span className="text-xs">添加图片</span>
-                    </div>
-                  )}
-
-                  {isUploading && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <Upload size={20} className="text-white drop-shadow-md" />
-                  </div>
-                </div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileChange}
+            {/* Icon Display and Picker */}
+            <div className="flex flex-col items-center mb-4">
+              <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-600 border border-zinc-100 shadow-inner mb-3">
+                <ItemIcon
+                  category={formData.category || ''}
+                  name={formData.name || ''}
+                  iconName={formData.iconName}
+                  className="w-12 h-12"
                 />
               </div>
-            )}
 
-            {/* Icon Display (Only for Fridge) */}
-            {type === ItemType.FRIDGE && (
-              <div className="flex justify-center mb-4">
-                <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-zinc-600 border border-zinc-100 shadow-inner">
-                  <ItemIcon
-                    category={formData.category || ''}
-                    name={formData.name || ''}
-                    className="w-12 h-12"
-                  />
-                </div>
+              <div className="w-full max-w-xs">
+                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+                  图标选择
+                </label>
+                <IconPicker
+                  selectedIcon={formData.iconName}
+                  onSelect={(iconName) => setFormData({ ...formData, iconName: iconName || undefined })}
+                  category={formData.category || ''}
+                  name={formData.name || ''}
+                />
+                <p className="text-xs text-zinc-400 mt-1.5 text-center">
+                  {formData.iconName ? '已自定义图标' : '自动根据名称和分类选择'}
+                </p>
               </div>
-            )}
+            </div>
 
             <div>
               <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">名称</label>
@@ -135,50 +161,82 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
                 </div>
               </div>
 
-              {type === ItemType.FRIDGE ? (
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">数量</label>
-                  <input
-                    className="w-full skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none"
-                    value={formData.quantity || ''}
-                    onChange={e => setFormData({ ...formData, quantity: e.target.value })}
-                    placeholder="如: 500g"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">颜色</label>
-                  <input
-                    className="w-full skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none"
-                    value={formData.color || ''}
-                    onChange={e => setFormData({ ...formData, color: e.target.value })}
-                    placeholder="如: 藏青"
-                  />
-                </div>
-              )}
+              <div>
+                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">数量</label>
+                <input
+                  className="w-full skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none"
+                  value={formData.quantity || ''}
+                  onChange={e => setFormData({ ...formData, quantity: e.target.value })}
+                  placeholder="如: 500g"
+                />
+              </div>
             </div>
 
-            {type === ItemType.FRIDGE ? (
-              <div>
-                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">过期日期</label>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  {dateMode === 'date' ? '过期日期' : '保质期'}
+                </label>
+                <div className="flex bg-zinc-100 rounded-lg p-0.5">
+                  <button
+                    onClick={() => handleModeSwitch('date')}
+                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${dateMode === 'date'
+                      ? 'bg-white text-zinc-900 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700'
+                      }`}
+                  >
+                    日期
+                  </button>
+                  <button
+                    onClick={() => handleModeSwitch('duration')}
+                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${dateMode === 'duration'
+                      ? 'bg-white text-zinc-900 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-700'
+                      }`}
+                  >
+                    时长
+                  </button>
+                </div>
+              </div>
+
+              {dateMode === 'date' ? (
                 <input
                   type="date"
                   className="w-full skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none font-mono text-sm"
                   value={formData.expiryDate || ''}
                   onChange={e => setFormData({ ...formData, expiryDate: e.target.value })}
                 />
-              </div>
-            ) : (
-              <div>
-                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">适用季节</label>
-                <input
-                  className="w-full skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none"
-                  value={formData.season || ''}
-                  onChange={e => setFormData({ ...formData, season: e.target.value })}
-                  placeholder="如: 春/秋"
-                />
-              </div>
-            )}
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex gap-3">
+                    <input
+                      type="number"
+                      className="flex-1 skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none font-mono text-sm"
+                      placeholder="例如: 3"
+                      value={durationValue}
+                      onChange={e => setDurationValue(e.target.value)}
+                    />
+                    <div className="relative w-24">
+                      <select
+                        className="w-full appearance-none skeuo-inner px-4 py-3 text-zinc-900 focus:outline-none text-sm"
+                        value={durationUnit}
+                        onChange={e => setDurationUnit(e.target.value as any)}
+                      >
+                        <option value="days">天</option>
+                        <option value="weeks">周</option>
+                        <option value="months">月</option>
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-3.5 text-zinc-400 pointer-events-none" />
+                    </div>
+                  </div>
+                  {formData.expiryDate && (
+                    <p className="text-xs text-zinc-400 text-right">
+                      预计过期: {formData.expiryDate}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
 
             <button
               onClick={() => onSave(formData)}

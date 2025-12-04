@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Edit2, Trash2, Image as ImageIcon, Check, X } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { InventoryItem, ItemType } from '../types';
 import { ItemIcon } from '../utils/iconMapper';
@@ -8,10 +8,12 @@ interface ItemCardProps {
   item: InventoryItem;
   onEdit: (item: InventoryItem) => void;
   onDelete: (item: InventoryItem) => void;
+  onConsume?: (item: InventoryItem) => void;
+  onWaste?: (item: InventoryItem) => void;
   index: number;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, onEdit, onDelete, index }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, onEdit, onDelete, onConsume, onWaste, index }) => {
   const [showMenu, setShowMenu] = useState(false);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -55,7 +57,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onEdit, onDelete, inde
         <div className="aspect-square w-full relative overflow-hidden bg-zinc-100 mb-3">
           {item.type === ItemType.FRIDGE ? (
             <div className="w-full h-full flex items-center justify-center bg-zinc-50 text-zinc-600">
-              <ItemIcon category={item.category} name={item.name} className="w-16 h-16 opacity-80" />
+              <ItemIcon category={item.category} name={item.name} iconName={item.iconName} className="w-16 h-16 opacity-80" />
             </div>
           ) : item.imageUrl ? (
             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-in-out group-hover:scale-110" />
@@ -92,31 +94,37 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onEdit, onDelete, inde
                 <span>{item.quantity}</span>
               </>
             )}
-            {item.type === ItemType.WARDROBE && (
-              <>
-                <span>•</span>
-                <span>{item.season}</span>
-              </>
-            )}
           </div>
         </div>
       </div>
 
       {showMenu && (
         <div
-          className="absolute inset-0 z-20 bg-zinc-900/90 backdrop-blur-sm flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200"
+          className="absolute inset-0 z-20 bg-zinc-900/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 animate-in fade-in zoom-in duration-200 p-4"
           onClick={(e) => {
             e.stopPropagation();
             setShowMenu(false);
           }}
         >
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(item); setShowMenu(false); }}
-            className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg"
+            onClick={(e) => { e.stopPropagation(); onConsume?.(item); setShowMenu(false); }}
+            className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors shadow-lg w-full justify-center"
           >
-            <Trash2 size={18} /> <span className="text-sm font-medium">删除物品</span>
+            <Check size={16} /> <span className="text-sm font-medium">吃掉了</span>
           </button>
-          <p className="absolute bottom-6 text-[10px] text-zinc-400">点击任意处关闭</p>
+          <button
+            onClick={(e) => { e.stopPropagation(); onWaste?.(item); setShowMenu(false); }}
+            className="flex items-center gap-2 px-6 py-2.5 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors shadow-lg w-full justify-center"
+          >
+            <X size={16} /> <span className="text-sm font-medium">浪费了</span>
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(item); setShowMenu(false); }}
+            className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white transition-colors mt-2"
+          >
+            <Trash2 size={14} /> <span className="text-xs">删除</span>
+          </button>
+          <p className="absolute bottom-4 text-[10px] text-zinc-500">点击任意处关闭</p>
         </div>
       )}
     </div>

@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
       'process.env.ZENMUX_API_KEY': JSON.stringify(env.ZENMUX_API_KEY),
       'process.env.ZENMUX_PROVIDER': JSON.stringify(env.ZENMUX_PROVIDER),
       'process.env.ZENMUX_MODEL': JSON.stringify(env.ZENMUX_MODEL),
+      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
     resolve: {
       alias: {

@@ -1,15 +1,12 @@
 
 export enum AppView {
-  DASHBOARD = 'DASHBOARD',
   FRIDGE = 'FRIDGE',
-  WARDROBE = 'WARDROBE',
-  SETTINGS = 'SETTINGS',
   RECIPES = 'RECIPES',
+  SETTINGS = 'SETTINGS',
 }
 
 export enum ItemType {
   FRIDGE = 'FRIDGE',
-  WARDROBE = 'WARDROBE',
 }
 
 export interface InventoryItem {
@@ -23,9 +20,12 @@ export interface InventoryItem {
   expiryDate?: string; // For fridge
   quantity?: string;   // For fridge
   emoji?: string;      // For fridge items instead of image
-  color?: string;      // For wardrobe
-  season?: string;     // For wardrobe
+  iconName?: string;   // Custom icon name (overrides auto-selection)
   notes?: string;
+  status?: 'active' | 'consumed' | 'wasted';
+  consumedAt?: number;
+  wastedAt?: number;
+  usageProgress?: number; // 0-100, percentage of usage
 }
 
 export interface Recipe {
@@ -49,8 +49,6 @@ export interface ItemAnalysis {
   category: string;
   emoji?: string;
   expiryDate?: string;
-  season?: string;
-  color?: string;
   quantity?: string;
   suggestedUse?: string;
 }
@@ -63,4 +61,5 @@ export interface AnalysisResult {
 export interface UserProfile {
   name: string;
   emails: string[];
+  avatar?: string;
 }

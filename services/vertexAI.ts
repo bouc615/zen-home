@@ -19,15 +19,8 @@ export interface VertexAIClient {
 /**
  * 创建 Vertex AI 客户端
  */
-export function createVertexAIClient(apiKey: string): VertexAIClient {
-  const client = new GoogleGenAI({
-    apiKey,
-    vertexai: true,
-    httpOptions: {
-      baseUrl: "https://zenmux.ai/api/vertex-ai",
-      apiVersion: "v1"
-    }
-  });
+export function createVertexAIClient(apiKey?: string): VertexAIClient {
+  const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   return {
     async generateContent(params) {
@@ -152,4 +145,39 @@ export async function chat(
   } as any);
 
   return response.text || "";
+}
+
+/**
+ * 使用 Vertex AI 生成内容 (带降级策略)
+ * 依次尝试模型列表，如果遇到资源耗尽错误则尝试下一个模型
+ * 限额文档: https://ai.google.dev/gemini-api/docs/rate-limits?hl=zh-cn#usage-tiers
+ */
+export async function generateContentWithFallback(
+  client: VertexAIClient,
+  prompt: string,
+  models: string[] = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-2.5-pro"]
+): Promise<string> {
+  for (const model of models) {
+    try {
+      return await generateContent(client, model, prompt);
+    } catch (error: any) {
+      // 检查是否为资源耗尽错误 (429 Resource Exhausted)
+      // Google GenAI SDK 可能抛出不同的错误结构，这里尝试覆盖常见情况
+      const isResourceExhausted =
+        error.status === 429 ||
+        error.code === 429 ||
+        (error.message && /Resource.*exhausted/i.test(error.message)) ||
+        (error.error && error.error.code === 429);
+
+      if (isResourceExhausted) {
+        console.warn(`Model ${model} exhausted, trying next...`);
+        continue;
+      }
+
+      // 如果是其他错误 (如模型不存在, 参数错误等), 直接抛出
+      throw error;
+    }
+  }
+
+  throw new Error("所有模型均已超限，请稍后重试");
 }

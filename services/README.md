@@ -79,13 +79,13 @@ const result = await analyzeImage(base64Image, ItemType.FRIDGE);
 ```
 
 **特性:**
-- ✅ 自动识别图片中的**所有物品**
-- ✅ 为每个物品提供详细信息
-- ✅ 返回识别到的物品总数
-- ✅ 单个物品：打开编辑框确认
+- ✅ 自动识别图片中的**所有食材**
+- ✅ 为每个食材提供详细信息（过期日期、数量等）
+- ✅ 返回识别到的食材总数
+- ✅ 支持购物小票批量识别
 - ✅ 多个物品：批量自动添加
 
-### 2. AI 聊天对话
+### 2. AI 聊天对话 - 厨房管家
 
 ```typescript
 import { sendChatMessage } from "./services/aiService";
@@ -94,9 +94,15 @@ const response = await sendChatMessage(
   history, 
   "推荐一道菜", 
   inventory, 
-  ItemType.FRIDGE
+  recipes
 );
 ```
+
+**特性:**
+- ✅ 基于冰箱库存推荐食谱
+- ✅ 优先消耗即将过期的食材
+- ✅ 减少食物浪费的建议
+- ✅ 正念烹饪指导
 
 ## 使用方法
 
@@ -104,15 +110,15 @@ const response = await sendChatMessage(
 import { analyzeImage, sendChatMessage } from "./services/aiService";
 import { ItemType } from "./types";
 
-// 图像分析 - 支持识别多个物品
+// 图像分析 - 支持识别多个食材
 const result = await analyzeImage(base64Image, ItemType.FRIDGE);
-console.log(`识别到 ${result.totalCount} 个物品`);
+console.log(`识别到 ${result.totalCount} 个食材`);
 result.items.forEach(item => {
   console.log(`- ${item.name} (${item.category})`);
 });
 
 // 聊天
-const response = await sendChatMessage(history, message, inventory, ItemType.FRIDGE);
+const response = await sendChatMessage(history, message, inventory, recipes);
 ```
 
 ## 环境变量配置
@@ -150,7 +156,8 @@ ZENMUX_PROVIDER=openai
 - ✅ **易于扩展** - 添加新提供商只需实现基础能力层
 - ✅ **职责单一** - 每个文件只负责一件事
 - ✅ **可维护** - 修改业务逻辑不影响 AI 调用
-- ✅ **多物品识别** - 自动识别图片中的所有物品
+- ✅ **多物品识别** - 自动识别图片中的所有食材
+- ✅ **ZenKitchen 专注** - 专为厨房管理优化
 
 ## 🔧 扩展新的 AI 提供商
 

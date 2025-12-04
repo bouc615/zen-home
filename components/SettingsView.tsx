@@ -33,14 +33,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ profile, onUpdate })
       </GlassCard>
 
       <GlassCard className="!rounded-none !border-zinc-200">
-        <h3 className="font-serif text-lg text-zinc-900 mb-4">关于 ZenHome</h3>
+        <h3 className="font-serif text-lg text-zinc-900 mb-4">关于 ZenKitchen</h3>
         <p className="text-sm text-zinc-500 font-light leading-relaxed">
-          ZenHome 是一款极简主义的家庭物品管理应用。我们相信，通过清晰地了解自己拥有的物品，可以减少浪费，过上更正念的生活。
+          ZenKitchen 是一款极简主义的厨房管理应用。我们相信，通过清晰地了解冰箱里的食材，可以减少浪费，过上更正念的生活。
         </p>
       </GlassCard>
 
       <div className="text-center pt-8 text-zinc-300 text-xs font-serif italic">
-        ZenHome v1.0 • Designed with Mindfulness
+        ZenKitchen v1.0 • Designed with Mindfulness
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ChefHat } from 'lucide-react';
-import { GlassCard } from './GlassCard';
-import { Recipe } from '../types';
+import { GlassCard } from '../../ui/GlassCard';
+import { Recipe } from '../../../types';
 
 interface RecipeModalProps {
   isOpen: boolean;

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, Bot, User, Loader2, Image as ImageIcon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { ChatMessage, InventoryItem, Recipe } from '../types';
-import { sendChatMessage } from '../services/aiService';
+import { ChatMessage, InventoryItem, Recipe } from '../../../types';
+import { sendChatMessage } from '../../../services/aiService';
 
 interface AIChatViewProps {
   messages: ChatMessage[];

@@ -1,0 +1,9 @@
+{
+  "name": "ai-vision",
+  "version": "1.0.0",
+  "description": "AI Vision Function",
+  "main": "index.js",
+  "dependencies": {
+    "@google/genai": "^1.30.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "envId": "zen-home-v1-1gm9o896f89db45f",
+  "functionRoot": "./cloudfunctions",
+  "functions": [
+    {
+      "name": "ai-chat",
+      "timeout": 60,
+      "envVariables": {
+        "GEMINI_API_KEY": "AIzaSyD-8E04SvObTOqDIg1c12br_UNAxAUm5VI"
+      },
+      "installDependency": true
+    },
+    {
+      "name": "ai-vision",
+      "timeout": 60,
+      "envVariables": {
+        "GEMINI_API_KEY": "AIzaSyD-8E04SvObTOqDIg1c12br_UNAxAUm5VI"
+      },
+      "installDependency": true
+    }
+  ]
+}

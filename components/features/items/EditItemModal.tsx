@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronDown, Camera, Upload } from 'lucide-react';
-import { GlassCard } from './GlassCard';
-import { InventoryItem, ItemType } from '../types';
-import { FRIDGE_CATEGORIES } from '../constants';
-import { uploadFile } from '../services/cloudService';
-import { ItemIcon } from '../utils/iconMapper';
-import { IconPicker } from './IconPicker';
+import { GlassCard } from '../../ui/GlassCard';
+import { InventoryItem, ItemType } from '../../../types';
+import { FRIDGE_CATEGORIES } from '../../../constants';
+import { uploadFile } from '../../../services/cloudService';
+import { ItemIcon } from '../../../utils/iconMapper';
+import { IconPicker } from '../../ui/IconPicker';
 
 interface EditItemModalProps {
   isOpen: boolean;
@@ -50,22 +50,6 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, o
   const currentCategories = formData.category && !categories.includes(formData.category)
     ? [...categories, formData.category]
     : categories;
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      const url = await uploadFile(file);
-      setFormData(prev => ({ ...prev, imageUrl: url }));
-    } catch (error) {
-      console.error("Upload failed", error);
-      alert("上传失败，请重试");
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   const handleModeSwitch = (mode: 'date' | 'duration') => {
     setDateMode(mode);

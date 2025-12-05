@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Edit2, Trash2, Image as ImageIcon, Check, X } from 'lucide-react';
-import { GlassCard } from './GlassCard';
-import { InventoryItem, ItemType } from '../types';
-import { ItemIcon } from '../utils/iconMapper';
+import { GlassCard } from '../../ui/GlassCard';
+import { InventoryItem, ItemType } from '../../../types';
+import { ItemIcon } from '../../../utils/iconMapper';
 
 interface ItemCardProps {
   item: InventoryItem;

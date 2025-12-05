@@ -1,6 +1,6 @@
 import React from 'react';
-import { GlassCard } from './GlassCard';
-import { UserProfile } from '../types';
+import { GlassCard } from '../ui/GlassCard';
+import { UserProfile } from '../../types';
 
 interface SettingsViewProps {
   profile: UserProfile;

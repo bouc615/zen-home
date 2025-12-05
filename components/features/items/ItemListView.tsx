@@ -1,7 +1,7 @@
 import React from 'react';
-import { InventoryItem, ItemType } from '../types';
-import { ItemIcon } from '../utils/iconMapper';
-import { getExpiryStatus } from '../utils/dateUtils';
+import { InventoryItem, ItemType } from '../../../types';
+import { ItemIcon } from '../../../utils/iconMapper';
+import { getExpiryStatus } from '../../../utils/dateUtils';
 
 interface ItemListViewProps {
   items: InventoryItem[];

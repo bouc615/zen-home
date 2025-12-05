@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { InventoryItem } from '../types';
-import { ItemIcon } from '../utils/iconMapper';
+import { InventoryItem } from '../../types';
+import { ItemIcon } from '../../utils/iconMapper';
 import { Trash2, Edit2, X } from 'lucide-react';
 
 interface ActionSheetProps {

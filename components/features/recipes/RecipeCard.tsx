@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, ChefHat, Edit2, Trash2 } from 'lucide-react';
-import { GlassCard } from './GlassCard';
-import { Recipe } from '../types';
+import { GlassCard } from '../../ui/GlassCard';
+import { Recipe } from '../../../types';
 
 interface RecipeCardProps {
   recipe: Recipe;

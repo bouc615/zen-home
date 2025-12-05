@@ -10,6 +10,7 @@ export enum ItemType {
 }
 
 export interface InventoryItem {
+  _id?: string; // CloudBase document ID
   id: string;
   name: string;
   type: ItemType;
@@ -29,6 +30,7 @@ export interface InventoryItem {
 }
 
 export interface Recipe {
+  _id?: string; // CloudBase document ID
   id: string;
   name: string;
   imageUrl: string;

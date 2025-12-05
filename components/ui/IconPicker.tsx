@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ICON_MAP, AVAILABLE_ICONS } from '../utils/iconMapper';
+import { ICON_MAP, AVAILABLE_ICONS } from '../../utils/iconMapper';
 import { ChevronDown, Check } from 'lucide-react';
 
 interface IconPickerProps {
@@ -97,8 +97,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({ selectedIcon, onSelect, 
                           setIsOpen(false);
                         }}
                         className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isSelected
-                            ? 'bg-emerald-50 text-emerald-600 ring-2 ring-emerald-500'
-                            : 'hover:bg-zinc-50 text-zinc-600'
+                          ? 'bg-emerald-50 text-emerald-600 ring-2 ring-emerald-500'
+                          : 'hover:bg-zinc-50 text-zinc-600'
                           }`}
                         title={iconName}
                       >

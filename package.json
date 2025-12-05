@@ -8,8 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "deploy:tcb": "npx @cloudbase/cli hosting deploy ./dist -e zen-home-v1-1gm9o896f89db45f"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@cloudbase/js-sdk": "^2.22.9",

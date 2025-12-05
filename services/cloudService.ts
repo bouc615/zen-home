@@ -260,63 +260,25 @@ export async function deleteRecipe(recipe: Recipe): Promise<void> {
 // ============================================================================
 
 /**
- * 调用 AI 对话云函数
- * @param history 聊天历史
- * @param message 用户消息
- * @param inventory 库存信息
- * @param recipes 菜谱信息
+ * 通用云函数调用
+ * @param name 云函数名称
+ * @param data 传递给云函数的参数
  */
-export async function callAI(
-  history: any[],
-  message: string,
-  inventory: any[],
-  recipes: any[]
-): Promise<string> {
+export async function callFunction(name: string, data: any): Promise<any> {
   await ensureAuth();
   try {
     const res = await app.callFunction({
-      name: 'ai-chat', // 云函数名称
-      data: {
-        history,
-        message,
-        inventory,
-        recipes
-      }
-    });
-
-    if (res.result && res.result.text) {
-      return res.result.text;
-    }
-    throw new Error('AI response format error');
-  } catch (error: any) {
-    console.error("Cloud Function 'ai-chat' failed:", error);
-    throw new Error(error.message || 'AI 服务暂时不可用');
-  }
-}
-
-/**
- * 调用 AI 图像分析云函数
- * @param base64Image 图片 Base64 数据
- * @param type 物品类型
- */
-export async function callImageAnalysis(base64Image: string, type: string): Promise<any> {
-  await ensureAuth();
-  try {
-    const res = await app.callFunction({
-      name: 'ai-vision', // 云函数名称
-      data: {
-        image: base64Image,
-        type
-      }
+      name,
+      data
     });
 
     if (res.result) {
       return res.result;
     }
-    throw new Error('Analysis response format error');
+    throw new Error(`Cloud function '${name}' returned no result`);
   } catch (error: any) {
-    console.error("Cloud Function 'ai-vision' failed:", error);
-    throw new Error(error.message || '图像识别服务暂时不可用');
+    console.error(`Cloud Function '${name}' failed:`, error);
+    throw new Error(error.message || '服务暂时不可用');
   }
 }
 

@@ -1,9 +1,0 @@
-{
-  "name": "ai-chat",
-  "version": "1.0.0",
-  "description": "AI Chat Function",
-  "main": "index.js",
-  "dependencies": {
-    "@google/genai": "^1.30.0"
-  }
-}

@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: '/zen-home/',
+    base: mode === 'development' ? '/' : '/zen-home/',
     server: {
       port: 3000,
       host: '0.0.0.0',

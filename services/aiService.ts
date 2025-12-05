@@ -1,8 +1,10 @@
 import { InventoryItem, ItemType, AnalysisResult, ChatMessage, Recipe } from "../types";
-import { callAI, callImageAnalysis } from "./cloudService";
+import { callFunction } from "./cloudService";
 
 /**
- * 发送聊天消息 (Delegates to Cloud Function)
+ * 发送聊天消息
+ * 目前使用 CloudBase 云函数 'ai-chat'
+ * 后期可替换为自定义服务器接口
  */
 export async function sendChatMessage(
   history: ChatMessage[],
@@ -14,8 +16,17 @@ export async function sendChatMessage(
     // 简化 history 对象，只传输必要字段
     const simpleHistory = history.map(h => ({ role: h.role, text: h.text }));
 
-    const responseText = await callAI(simpleHistory, message, inventory, recipes);
-    return responseText;
+    const result = await callFunction('ai-chat', {
+      history: simpleHistory,
+      message,
+      inventory,
+      recipes
+    });
+
+    if (result && result.text) {
+      return result.text;
+    }
+    throw new Error('AI response format error');
   } catch (error) {
     console.error("Chat failed", error);
     return "抱歉，我现在有点累，请稍后再试。";
@@ -23,11 +34,17 @@ export async function sendChatMessage(
 }
 
 /**
- * 分析图像识别物品 (Delegates to Cloud Function)
+ * 分析图像识别物品
+ * 目前使用 CloudBase 云函数 'ai-vision'
+ * 后期可替换为自定义服务器接口
  */
 export async function analyzeImage(base64Image: string, type: ItemType): Promise<AnalysisResult> {
   try {
-    const result = await callImageAnalysis(base64Image, type);
+    const result = await callFunction('ai-vision', {
+      image: base64Image,
+      type
+    });
+
     return result as AnalysisResult;
   } catch (error) {
     console.error("Analysis failed", error);
@@ -37,5 +54,3 @@ export async function analyzeImage(base64Image: string, type: ItemType): Promise
     };
   }
 }
-
-

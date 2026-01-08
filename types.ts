@@ -64,4 +64,10 @@ export interface UserProfile {
   name: string;
   emails: string[];
   avatar?: string;
+  preferences?: {
+    dietary?: string[];
+    dislikes?: string[];
+    spiciness?: 'none' | 'mild' | 'medium' | 'hot';
+    cuisine?: string[];
+  };
 }

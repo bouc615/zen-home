@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import { Recipe, ItemType, ChatMessage } from './types';
+import { Recipe, ItemType, ChatMessage, UserProfile } from './types';
 import { analyzeImage, sendChatMessage } from './services/aiService';
 import { fetchItems, addItem, updateItem, deleteItem, fetchRecipes, addRecipe, updateRecipe, deleteRecipe } from './services/cloudService';
 import { EditItemModal } from './components/features/items/EditItemModal';
@@ -28,6 +28,19 @@ function App() {
   const [isNewItem, setIsNewItem] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Partial<Recipe> | null>(null);
   const [isNewRecipe, setIsNewRecipe] = useState(false);
+
+  // User Profile
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: 'User',
+    emails: [],
+    avatar: '',
+    preferences: {
+      dietary: [],
+      dislikes: [],
+      spiciness: 'medium',
+      cuisine: []
+    }
+  });
 
   // AI & Loading
   const [isThinking, setIsThinking] = useState(false);
@@ -230,7 +243,7 @@ function App() {
           <Route
             path="/settings"
             element={
-              <SettingsView profile={{ name: 'User', emails: [], avatar: '' }} onUpdate={() => { }} />
+              <SettingsView profile={userProfile} onUpdate={setUserProfile} />
             }
           />
           <Route

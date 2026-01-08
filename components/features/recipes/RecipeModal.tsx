@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { X, ChefHat } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, ChefHat, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { GlassCard } from '../../ui/GlassCard';
 import { Recipe } from '../../../types';
+import { uploadFile } from '../../../services/cloudService';
 
 interface RecipeModalProps {
   isOpen: boolean;
@@ -13,10 +14,28 @@ interface RecipeModalProps {
 
 export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, onSave, initialData, isNew }) => {
   const [formData, setFormData] = useState<Partial<Recipe>>({});
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setFormData(initialData || {});
   }, [initialData]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const url = await uploadFile(file);
+      setFormData(prev => ({ ...prev, imageUrl: url }));
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('图片上传失败，请重试');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -36,6 +55,42 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, onSav
           </div>
 
           <div className="space-y-5">
+            {/* Image Upload Area */}
+            <div
+              className="w-full aspect-video bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-100 transition-colors relative overflow-hidden group"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+
+              {formData.imageUrl ? (
+                <>
+                  <img src={formData.imageUrl} alt="Recipe" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 bg-white/90 px-3 py-1.5 rounded-full text-xs font-medium text-zinc-700 shadow-sm transition-opacity">
+                      更换图片
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-zinc-400">
+                  {uploading ? (
+                    <Loader2 size={24} className="animate-spin text-zinc-500" />
+                  ) : (
+                    <>
+                      <ImageIcon size={24} />
+                      <span className="text-xs font-medium">点击上传封面图</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">菜名</label>
               <input
@@ -78,9 +133,10 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, onSav
 
             <button
               onClick={() => onSave(formData)}
-              className="w-full py-3.5 btn-primary font-medium transition-all mt-4 active:scale-[0.98]"
+              disabled={uploading}
+              className="w-full py-3.5 btn-primary font-medium transition-all mt-4 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isNew ? '保存菜谱' : '更新菜谱'}
+              {uploading ? '上传中...' : (isNew ? '保存菜谱' : '更新菜谱')}
             </button>
           </div>
         </GlassCard>

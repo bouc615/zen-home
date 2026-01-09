@@ -1,15 +1,16 @@
-import { supabase, TABLES } from '../config/database';
-import { InventoryItem } from '../types';
+import { supabase, TABLES } from "../config/database";
+import { InventoryItem } from "../types";
 
 export class ItemsService {
   /**
-   * Get all items
+   * Get all items for a specific household
    */
-  async getAllItems(): Promise<InventoryItem[]> {
+  async getAllItems(householdId: string): Promise<InventoryItem[]> {
     const { data, error } = await supabase
       .from(TABLES.ITEMS)
-      .select('*')
-      .order('added_at', { ascending: false });
+      .select("*")
+      .eq("household_id", householdId)
+      .order("added_at", { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch items: ${error.message}`);
@@ -21,11 +22,21 @@ export class ItemsService {
   /**
    * Create a new item
    */
-  async createItem(item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>): Promise<{ id: string }> {
+  async createItem(
+    item: Omit<InventoryItem, "id" | "created_at" | "updated_at">,
+    userId: string,
+    householdId: string
+  ): Promise<{ id: string }> {
     const { data, error } = await supabase
       .from(TABLES.ITEMS)
-      .insert([item])
-      .select('id')
+      .insert([
+        {
+          ...item,
+          user_id: userId,
+          household_id: householdId,
+        },
+      ])
+      .select("id")
       .single();
 
     if (error) {
@@ -42,7 +53,7 @@ export class ItemsService {
     const { error } = await supabase
       .from(TABLES.ITEMS)
       .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) {
       throw new Error(`Failed to update item: ${error.message}`);
@@ -53,10 +64,7 @@ export class ItemsService {
    * Delete an item
    */
   async deleteItem(id: string): Promise<void> {
-    const { error } = await supabase
-      .from(TABLES.ITEMS)
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from(TABLES.ITEMS).delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete item: ${error.message}`);

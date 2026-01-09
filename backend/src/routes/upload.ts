@@ -1,7 +1,8 @@
-import { Router } from 'express';
-import multer from 'multer';
-import { supabase } from '../config/database';
-import { asyncHandler } from '../middleware/errorHandler';
+import { Router } from "express";
+import multer from "multer";
+import sharp from "sharp";
+import { supabase } from "../config/database";
+import { asyncHandler } from "../middleware/errorHandler";
 
 const router = Router();
 
@@ -14,33 +15,48 @@ const upload = multer({
 });
 
 // POST /api/upload - Upload file
-router.post('/', upload.single('file'), asyncHandler(async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
+router.post(
+  "/",
+  upload.single("file"),
+  asyncHandler(async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
-  const file = req.file;
-  const fileName = `${Date.now()}-${file.originalname}`;
-  const filePath = `uploads/${fileName}`;
+    const file = req.file;
 
-  // Upload to Supabase Storage
-  const { data, error } = await supabase.storage
-    .from('images')
-    .upload(filePath, file.buffer, {
-      contentType: file.mimetype,
-      upsert: false,
-    });
+    // Optimize image: resize and convert to WebP
+    const optimizedBuffer = await sharp(file.buffer)
+      .resize(1920, 1920, {
+        // Limit max dimension to 1920px (Full HD)
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 80 }) // Convert to WebP with 80% quality
+      .toBuffer();
 
-  if (error) {
-    throw new Error(`Upload failed: ${error.message}`);
-  }
+    const fileName = `${Date.now()}-${file.originalname.split(".")[0]}.webp`;
+    const filePath = `uploads/${fileName}`;
 
-  // Get public URL
-  const { data: urlData } = supabase.storage
-    .from('images')
-    .getPublicUrl(filePath);
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from("images")
+      .upload(filePath, optimizedBuffer, {
+        contentType: "image/webp",
+        upsert: false,
+      });
 
-  res.json({ url: urlData.publicUrl });
-}));
+    if (error) {
+      throw new Error(`Upload failed: ${error.message}`);
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from("images")
+      .getPublicUrl(filePath);
+
+    res.json({ url: urlData.publicUrl });
+  })
+);
 
 export default router;

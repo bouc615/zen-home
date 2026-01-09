@@ -58,6 +58,8 @@ export interface AnalysisResult {
 }
 
 export interface UserProfile {
+  id: string;
+  household_id?: string;
   name: string;
   emails: string[];
   avatar?: string;

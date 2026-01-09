@@ -12,6 +12,13 @@ export const API_CONFIG = {
 
 // API 端点
 export const API_ENDPOINTS = {
+  // 基础 URL
+  BASE_URL: API_CONFIG.BASE_URL,
+
+  // 认证
+  AUTH_LOGIN: "/auth/login",
+  AUTH_ME: "/auth/me",
+
   // 物品管理
   ITEMS: "/items",
   ITEM_BY_ID: (id: string) => `/items/${id}`,
@@ -26,4 +33,9 @@ export const API_ENDPOINTS = {
 
   // 文件上传
   UPLOAD: "/upload",
+
+  // 家庭管理
+  HOUSEHOLD_JOIN: "/household/join",
+  HOUSEHOLD_LEAVE: "/household/leave",
+  HOUSEHOLD_MEMBERS: "/household/members",
 };

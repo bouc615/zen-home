@@ -4,6 +4,8 @@ import { PORT, ALLOWED_ORIGINS } from "./config/env";
 import { errorHandler } from "./middleware/errorHandler";
 
 // Import routes
+import authRouter from "./routes/auth";
+import householdRouter from "./routes/household";
 import itemsRouter from "./routes/items";
 import recipesRouter from "./routes/recipes";
 import aiRouter from "./routes/ai";
@@ -30,6 +32,8 @@ app.get("/health", (req, res) => {
 });
 
 // API routes
+app.use("/api/auth", authRouter);
+app.use("/api/household", householdRouter);
 app.use("/api/items", itemsRouter);
 app.use("/api/recipes", recipesRouter);
 app.use("/api/ai", aiRouter);

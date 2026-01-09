@@ -8,11 +8,13 @@ export interface InventoryItem {
   expiry_date?: string;
   quantity?: string;
   notes?: string;
-  status?: 'active' | 'consumed' | 'wasted';
+  status?: "active" | "consumed" | "wasted";
   usage_progress?: number;
   added_at: number;
   consumed_at?: number;
   wasted_at?: number;
+  user_id: string; // 创建者ID
+  household_id: string; // 家庭ID
   created_at?: string;
   updated_at?: string;
 }
@@ -25,12 +27,14 @@ export interface Recipe {
   ingredients: string;
   steps: string;
   added_at: number;
+  user_id: string; // 创建者ID
+  household_id: string; // 家庭ID
   created_at?: string;
   updated_at?: string;
 }
 
 export interface ChatMessage {
-  role: 'user' | 'model';
+  role: "user" | "model";
   text: string;
 }
 

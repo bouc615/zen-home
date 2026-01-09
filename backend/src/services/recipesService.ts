@@ -1,15 +1,16 @@
-import { supabase, TABLES } from '../config/database';
-import { Recipe } from '../types';
+import { supabase, TABLES } from "../config/database";
+import { Recipe } from "../types";
 
 export class RecipesService {
   /**
-   * Get all recipes
+   * Get all recipes for a specific household
    */
-  async getAllRecipes(): Promise<Recipe[]> {
+  async getAllRecipes(householdId: string): Promise<Recipe[]> {
     const { data, error } = await supabase
       .from(TABLES.RECIPES)
-      .select('*')
-      .order('added_at', { ascending: false });
+      .select("*")
+      .eq("household_id", householdId)
+      .order("added_at", { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch recipes: ${error.message}`);
@@ -21,11 +22,21 @@ export class RecipesService {
   /**
    * Create a new recipe
    */
-  async createRecipe(recipe: Omit<Recipe, 'id' | 'created_at' | 'updated_at'>): Promise<{ id: string }> {
+  async createRecipe(
+    recipe: Omit<Recipe, "id" | "created_at" | "updated_at">,
+    userId: string,
+    householdId: string
+  ): Promise<{ id: string }> {
     const { data, error } = await supabase
       .from(TABLES.RECIPES)
-      .insert([recipe])
-      .select('id')
+      .insert([
+        {
+          ...recipe,
+          user_id: userId,
+          household_id: householdId,
+        },
+      ])
+      .select("id")
       .single();
 
     if (error) {
@@ -42,7 +53,7 @@ export class RecipesService {
     const { error } = await supabase
       .from(TABLES.RECIPES)
       .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) {
       throw new Error(`Failed to update recipe: ${error.message}`);
@@ -53,10 +64,7 @@ export class RecipesService {
    * Delete a recipe
    */
   async deleteRecipe(id: string): Promise<void> {
-    const { error} = await supabase
-      .from(TABLES.RECIPES)
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from(TABLES.RECIPES).delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete recipe: ${error.message}`);

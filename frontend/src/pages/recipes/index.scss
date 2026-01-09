@@ -1,0 +1,144 @@
+.recipes-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 32rpx;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32rpx;
+}
+
+.header-title {
+  .title {
+    font-size: 48rpx;
+    font-weight: 600;
+    color: #18181b;
+    display: block;
+  }
+
+  .subtitle {
+    font-size: 20rpx;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 2rpx;
+    margin-top: 8rpx;
+    display: block;
+  }
+}
+
+.add-btn {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: #18181b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.1);
+
+  .icon {
+    font-size: 32rpx;
+  }
+}
+
+.search-bar {
+  margin-bottom: 32rpx;
+}
+
+.search-input {
+  width: 100%;
+  padding: 20rpx 32rpx;
+  background-color: #ffffff;
+  border: 2rpx solid #e4e4e7;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  color: #18181b;
+}
+
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.recipe-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.recipe-image {
+  width: 100%;
+  height: 400rpx;
+}
+
+.recipe-placeholder {
+  width: 100%;
+  height: 400rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .placeholder-icon {
+    font-size: 120rpx;
+  }
+}
+
+.recipe-info {
+  padding: 24rpx;
+}
+
+.recipe-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #18181b;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.recipe-tags {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 8rpx 16rpx;
+  background-color: #f4f4f5;
+  color: #52525b;
+  font-size: 24rpx;
+  border-radius: 12rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #71717a;
+  margin-bottom: 16rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #a1a1aa;
+}

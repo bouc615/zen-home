@@ -1,0 +1,190 @@
+.fridge-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 32rpx;
+}
+
+/* 头部 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32rpx;
+}
+
+.header-title {
+  .title {
+    font-size: 48rpx;
+    font-weight: 600;
+    color: #18181b;
+    display: block;
+  }
+
+  .subtitle {
+    font-size: 20rpx;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 2rpx;
+    margin-top: 8rpx;
+    display: block;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+
+  .icon {
+    font-size: 32rpx;
+  }
+
+  &.camera-btn {
+    background-color: #f4f4f5;
+    color: #52525b;
+  }
+
+  &.add-btn {
+    background-color: #18181b;
+    color: #ffffff;
+    box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 搜索框 */
+.search-bar {
+  margin-bottom: 32rpx;
+}
+
+.search-input {
+  width: 100%;
+  padding: 20rpx 32rpx;
+  background-color: #ffffff;
+  border: 2rpx solid #e4e4e7;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  color: #18181b;
+}
+
+/* 分类过滤 */
+.category-filter {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.category-item {
+  padding: 12rpx 24rpx;
+  background-color: #ffffff;
+  border: 2rpx solid #e4e4e7;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+
+  &.active {
+    background-color: #18181b;
+    border-color: #18181b;
+
+    .category-text {
+      color: #ffffff;
+    }
+  }
+}
+
+.category-text {
+  font-size: 24rpx;
+  color: #52525b;
+}
+
+/* 物品列表 */
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.item-emoji {
+  font-size: 64rpx;
+  margin-right: 24rpx;
+}
+
+.item-image {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 12rpx;
+  margin-right: 24rpx;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.item-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.item-category {
+  font-size: 24rpx;
+  color: #71717a;
+}
+
+.item-quantity {
+  font-size: 24rpx;
+  color: #a1a1aa;
+}
+
+.item-expiry {
+  font-size: 24rpx;
+  color: #f59e0b;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #71717a;
+  margin-bottom: 16rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #a1a1aa;
+}

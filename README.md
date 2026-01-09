@@ -1,32 +1,43 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ZenHome - 智能厨房管家
 
-# Run and deploy your AI Studio app
+一个基于 Taro 的微信小程序，帮助你管理食材库存和食谱。
 
-This contains everything you need to run your app locally.
+## 快速开始
 
-View your app in AI Studio: https://ai.studio/apps/drive/175B0nSqL-nT4t80kKt9V8bOAA_0I_6Pb
+```bash
+cd frontend
+npm install
+npm run dev:weapp
+```
 
-## Run Locally
+然后在微信开发者工具中导入 `frontend` 目录。
 
-**Prerequisites:**  Node.js
+## 功能特性
 
+- ✅ 食材管理（添加、编辑、删除、搜索、分类过滤）
+- ✅ 食谱管理（添加、编辑、删除、搜索）
+- ✅ AI 聊天助手（需要后端支持）
+- ✅ 图片识别（需要后端支持）
+- ✅ 用户设置
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 技术栈
 
+- Taro 4.x
+- React 18
+- TypeScript
+- SCSS
+- Webpack 5
 
-## TODO
-- 登录/退出登录
-- 添加物品
-- 编辑物品
-- 删除物品
-- 消耗物品
-- 浪费物品
-- ai 对话，生成食谱
-- 小票识别，批量录入
+## 项目结构
 
+```
+zen-home/
+├── frontend/          # Taro 微信小程序
+└── backend/           # Node.js 后端（待开发）
+```
+
+详细说明请查看 [frontend/README.md](frontend/README.md)
+
+## License
+
+MIT
